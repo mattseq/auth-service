@@ -1,10 +1,10 @@
-package com.mattseq.iam;
+package com.mattseq.authservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class IamApplicationTests {
+class AuthServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

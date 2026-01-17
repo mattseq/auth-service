@@ -1,4 +1,4 @@
-package com.mattseq.iam.dto;
+package com.mattseq.authservice.dto;
 
 import lombok.Builder;
 import lombok.Data;

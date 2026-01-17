@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mattseq</groupId>
-	<artifactId>iam</artifactId>
+	<artifactId>auth-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>iam</name>
-	<description>Identity &amp; Access Management System</description>
+	<name>auth-service</name>
+	<description>JWT-Based Identity and Authentication Server</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -86,6 +86,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.13.0</version>
 		</dependency>
 	</dependencies>
 

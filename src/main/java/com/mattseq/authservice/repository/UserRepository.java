@@ -1,6 +1,6 @@
-package com.mattseq.iam.repository;
+package com.mattseq.authservice.repository;
 
-import com.mattseq.iam.domain.User;
+import com.mattseq.authservice.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

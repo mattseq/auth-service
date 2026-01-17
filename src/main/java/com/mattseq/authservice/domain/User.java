@@ -1,4 +1,4 @@
-package com.mattseq.iam.domain;
+package com.mattseq.authservice.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

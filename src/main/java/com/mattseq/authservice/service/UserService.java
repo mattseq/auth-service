@@ -1,7 +1,7 @@
-package com.mattseq.iam.service;
+package com.mattseq.authservice.service;
 
-import com.mattseq.iam.domain.User;
-import com.mattseq.iam.repository.UserRepository;
+import com.mattseq.authservice.domain.User;
+import com.mattseq.authservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
