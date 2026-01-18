@@ -17,7 +17,14 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        if (repo.findByUsername(user.getUsername()).isPresent()) {
+            return null;
+        }
         return repo.save(user);
+    }
+
+    public Optional<User> findById(Long id) {
+        return repo.findById(id);
     }
 
     public Optional<User> findByUsername(String username) {

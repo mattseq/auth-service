@@ -6,15 +6,13 @@ import com.mattseq.authservice.dto.LoginRequest;
 import com.mattseq.authservice.dto.UserResponse;
 import com.mattseq.authservice.service.JwtService;
 import com.mattseq.authservice.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AuthServiceController {
@@ -71,17 +69,22 @@ public class AuthServiceController {
         }
     }
 
-    @GetMapping("/auth/logout")
-    public String logout() {
-        return "logout";
-    }
-
     @GetMapping("/auth/verify")
-    public String verify() {
-        return "verify";
+    public ResponseEntity<UserResponse> verify(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Claims claims = jwtService.parseToken(token);
+        String id = claims.getSubject();
+        User user = userService.findById(Long.parseLong(id)).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(mapToResponse(user));
     }
 
     private UserResponse mapToResponse(User user) {
+        if (user == null) {
+            return null;
+        }
         return UserResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())

@@ -1,5 +1,6 @@
 package com.mattseq.authservice.service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -10,6 +11,7 @@ import java.util.Date;
 
 @Service
 public class JwtService {
+    public static final byte[] SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
     public String generateToken(String subject) {
@@ -21,8 +23,15 @@ public class JwtService {
                 .compact();
     }
 
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     private Key getSignKey() {
-        byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(SECRET_KEY);
     }
 }
