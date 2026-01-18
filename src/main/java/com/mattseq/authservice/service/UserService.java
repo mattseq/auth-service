@@ -3,6 +3,7 @@ package com.mattseq.authservice.service;
 import com.mattseq.authservice.domain.User;
 import com.mattseq.authservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,8 +19,9 @@ public class UserService {
 
     public User createUser(User user) {
         if (repo.findByUsername(user.getUsername()).isPresent()) {
-            return null;
+            return null; // TODO: better error handling, use Optional<User>
         }
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         return repo.save(user);
     }
 
@@ -41,7 +43,7 @@ public class UserService {
 
     public Optional<User> login(String username, String password) {
         Optional<User> userOpt = repo.findByUsername(username);
-        if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
+        if (userOpt.isPresent() && BCrypt.checkpw(password, userOpt.get().getPassword())) {
             return userOpt;
         }
         return Optional.empty();

@@ -29,7 +29,7 @@ public class AuthServiceController {
         User user = User.builder()
                 .email(request.getEmail())
                 .username(request.getUsername())
-                .password(request.getPassword()) // TODO: hash this shit now before it hits the fan
+                .password(request.getPassword())
                 .build();
 
         User savedUser = userService.createUser(user);
