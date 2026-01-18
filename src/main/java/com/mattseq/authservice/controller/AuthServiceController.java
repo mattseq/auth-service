@@ -30,6 +30,7 @@ public class AuthServiceController {
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(request.getPassword())
+                .role(request.getRole())
                 .build();
 
         User savedUser = userService.createUser(user);
@@ -45,6 +46,7 @@ public class AuthServiceController {
                     .id(u.getId())
                     .email(u.getEmail())
                     .username(u.getUsername())
+                    .role(u.getRole())
                     .build()
             ))
             .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
@@ -89,6 +91,7 @@ public class AuthServiceController {
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .role(user.getRole())
                 .build();
     }
 }
