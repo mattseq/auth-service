@@ -6,13 +6,14 @@ import com.mattseq.authservice.dto.LoginRequest;
 import com.mattseq.authservice.dto.UserResponse;
 import com.mattseq.authservice.service.JwtService;
 import com.mattseq.authservice.service.UserService;
-import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 public class AuthServiceController {
@@ -53,7 +54,7 @@ public class AuthServiceController {
 
 
         if (user.getStatusCode() == HttpStatus.OK) {
-            String token = jwtService.generateToken(user.getBody().getId().toString());
+            String token = jwtService.generateToken(Objects.requireNonNull(user.getBody()));
 
             ResponseCookie cookie = ResponseCookie.from("AUTH_TOKEN", token)
                     .httpOnly(true)
@@ -74,13 +75,20 @@ public class AuthServiceController {
     @GetMapping("/auth/verify")
     public ResponseEntity<UserResponse> verify(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        Claims claims = jwtService.parseToken(token);
-        String id = claims.getSubject();
-        User user = userService.findById(Long.parseLong(id)).orElse(null);
+        if (!jwtService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long id = jwtService.extractId(token);
+        User user = userService.findById(id).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(mapToResponse(user));
+    }
+
+    @GetMapping("/admin/ping")
+    public String adminPing() {
+        return "pong from admin endpoint";
     }
 
     private UserResponse mapToResponse(User user) {
