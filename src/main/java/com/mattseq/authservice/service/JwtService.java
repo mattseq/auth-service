@@ -35,6 +35,21 @@ public class JwtService {
                 .getBody();
     }
 
+    public UserResponse extractUserResponse(String token) {
+        Claims claims = parseToken(token);
+        Long id = claims.get("id", Long.class);
+        String email = claims.get("email", String.class);
+        String username = claims.getSubject();
+        Role role = Role.valueOf(claims.get("role", String.class));
+
+        return UserResponse.builder()
+                .id(id)
+                .email(email)
+                .username(username)
+                .role(role)
+                .build();
+    }
+
     public String extractUsername(String token) {
         Claims claims = parseToken(token);
         return claims.getSubject();

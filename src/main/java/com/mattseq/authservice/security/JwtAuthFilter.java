@@ -1,6 +1,7 @@
 package com.mattseq.authservice.security;
 
 import com.mattseq.authservice.domain.Role;
+import com.mattseq.authservice.dto.UserResponse;
 import com.mattseq.authservice.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,8 +31,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = authHeader.replace("Bearer ", "");
 
             if (jwtService.isTokenValid(token)) {
-                Role role = jwtService.extractRole(token);
-                String username = jwtService.extractUsername(token);
+                UserResponse user = jwtService.extractUserResponse(token);
+                String username = user.getUsername();
+                Role role = user.getRole();
 
                 Set<SimpleGrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 
