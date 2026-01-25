@@ -105,11 +105,6 @@ public class AuthServiceController {
         return ResponseEntity.ok(mapToResponse(user));
     }
 
-    @GetMapping("/admin/ping")
-    public String adminPing() {
-        return "pong";
-    }
-
     private UserResponse mapToResponse(User user) {
         if (user == null) {
             return null;
