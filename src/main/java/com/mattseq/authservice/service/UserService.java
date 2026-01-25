@@ -1,5 +1,6 @@
 package com.mattseq.authservice.service;
 
+import com.mattseq.authservice.domain.Role;
 import com.mattseq.authservice.domain.User;
 import com.mattseq.authservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -47,5 +48,13 @@ public class UserService {
             return userOpt;
         }
         return Optional.empty();
+    }
+
+    public Optional<User> initializeAdmin(User user) {
+        if (repo.existsByRole(Role.ADMIN)) {
+            return Optional.empty();
+        }
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        return Optional.of(repo.save(user));
     }
 }

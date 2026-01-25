@@ -1,5 +1,6 @@
 package com.mattseq.authservice.controller;
 
+import com.mattseq.authservice.domain.Role;
 import com.mattseq.authservice.domain.User;
 import com.mattseq.authservice.dto.CreateUserRequest;
 import com.mattseq.authservice.dto.LoginRequest;
@@ -25,7 +26,25 @@ public class AuthServiceController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/auth/register")
+    @PostMapping("/auth/initialize")
+    public ResponseEntity<UserResponse> initializeAdmin(@Valid @RequestBody CreateUserRequest request) {
+        User user = User.builder()
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .role(request.getRole() != null ? request.getRole() : Role.ADMIN)
+                .build();
+
+        User savedUser = userService.initializeAdmin(user).orElse(null);
+
+        if (savedUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            return ResponseEntity.ok(mapToResponse(savedUser));
+        }
+    }
+
+    @PostMapping("/admin/register")
     public UserResponse register(@Valid @RequestBody CreateUserRequest request) {
         User user = User.builder()
                 .email(request.getEmail())
@@ -88,7 +107,7 @@ public class AuthServiceController {
 
     @GetMapping("/admin/ping")
     public String adminPing() {
-        return "pong from admin endpoint";
+        return "pong";
     }
 
     private UserResponse mapToResponse(User user) {
