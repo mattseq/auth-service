@@ -49,7 +49,6 @@ Small Spring Boot authentication service using JWTs.
     - Response:
         - `200 OK` with user metadata when an initial admin is created.
         - `401 Unauthorized` when an admin already exists (no user created).
-- 
 - POST `/admin/register`
     - Request: JSON (CreateUserRequest)
       ```json
@@ -82,5 +81,8 @@ Small Spring Boot authentication service using JWTs.
     - Response:
         - `200 OK` with the user's metadata if the token is valid. 
         - `401 Unauthorized` if the token is missing/invalid or the user cannot be found.
-  }
-}
+
+## Swagger UI
+- API documentation and testing is available at `http://localhost:8080/swagger-ui.html` when the application is running.
+- This provides an interactive interface to explore and test the API endpoints.
+- Some endpoints may require authentication - you can use the "Authorize" button in Swagger UI to input a valid JWT for testing protected endpoints.

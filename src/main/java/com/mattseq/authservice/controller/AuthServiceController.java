@@ -7,6 +7,7 @@ import com.mattseq.authservice.dto.LoginRequest;
 import com.mattseq.authservice.dto.UserResponse;
 import com.mattseq.authservice.service.JwtService;
 import com.mattseq.authservice.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -92,7 +93,11 @@ public class AuthServiceController {
     }
 
     @GetMapping("/auth/verify")
-    public ResponseEntity<UserResponse> verify(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<UserResponse> verify(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         String token = authHeader.replace("Bearer ", "");
         if (!jwtService.isTokenValid(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -116,4 +121,6 @@ public class AuthServiceController {
                 .role(user.getRole())
                 .build();
     }
+
+    // TODO: add admin and api endpoints, route traffic through /api to configured api
 }
