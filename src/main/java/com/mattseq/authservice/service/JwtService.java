@@ -5,7 +5,9 @@ import com.mattseq.authservice.dto.UserResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -15,8 +17,12 @@ import java.util.Map;
 
 @Service
 public class JwtService {
-    public static final byte[] SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
+    private final Key secretKey;
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
+
+    public JwtService(@Value("${SECRET_KEY}") String secretKey) {
+        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    }
 
     public String generateToken(UserResponse user) {
         Map<String, Object> claims = new HashMap<>();
@@ -29,7 +35,7 @@ public class JwtService {
 
     public Claims parseToken(String token) {
         return Jwts.parser()
-                .setSigningKey(getSignKey())
+                .setSigningKey(this.secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -87,11 +93,7 @@ public class JwtService {
                 .setIssuedAt(new Date())
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .signWith(this.secretKey, SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    private Key getSignKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY);
     }
 }
