@@ -92,6 +92,19 @@ public class AuthServiceController {
         }
     }
 
+    @PostMapping("/auth/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie.from("AUTH_TOKEN", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     @GetMapping("/auth/verify")
     public ResponseEntity<UserResponse> verify(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -108,6 +121,16 @@ public class AuthServiceController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(mapToResponse(user));
+    }
+
+    @GetMapping("/admin/ping")
+    public String adminPing() {
+        return "pong";
+    }
+
+    @GetMapping("/user/ping")
+    public String ping() {
+        return "pong";
     }
 
     private UserResponse mapToResponse(User user) {
