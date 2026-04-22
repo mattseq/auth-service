@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-public class AuthServiceController {
+public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
 
-    public AuthServiceController(UserService userService, JwtService jwtService) {
+    public AuthController(UserService userService, JwtService jwtService) {
         this.userService = userService;
         this.jwtService = jwtService;
     }
@@ -86,6 +86,20 @@ public class AuthServiceController {
         return userService.findById(id)
                 .map(user -> ResponseEntity.ok(UserResponse.fromUser(user)))
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    @PostMapping("/auth/demo-register")
+    public ResponseEntity<UserResponse> registerDemo(@Valid @RequestBody CreateUserRequest request) {
+        User user = User.builder()
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .role(Role.ADMIN)
+                .build();
+
+        return userService.createUser(user)
+                .map(u -> ResponseEntity.ok(UserResponse.fromUser(u)))
+                .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 
 

@@ -66,21 +66,44 @@ The compose file exposes the auth service on `http://localhost:8080`.
 
 ## API Endpoints
 
+The documentation below matches the controllers in this project (see `AuthController` and `UserController`). Paths, HTTP methods and required roles are shown.
+
 ### Public (`/auth/**`)
 
 #### `POST /auth/initialize`
-Creates the first admin account. Returns `401` if any admin already exists.
+Creates the first admin account. Intended to be called once at bootstrap. Returns `409 Conflict` if an admin already exists.
 
 Request:
 ```json
 {
   "email": "you@example.com",
   "username": "admin",
-  "password": "password",
-  "role": "ADMIN"
+  "password": "password"
 }
 ```
-Response: `200 OK` with user metadata, or `401 Unauthorized` if an admin already exists.
+Response: `200 OK` with user metadata, or `409 Conflict` if an admin already exists.
+
+---
+
+#### `POST /auth/register`
+Creates a new regular user account (open registration in the current implementation).
+
+Request:
+```json
+{
+  "email": "user@example.com",
+  "username": "user",
+  "password": "password"
+}
+```
+Response: `200 OK` with the created user's metadata, or `409 Conflict` if the username/email are already taken.
+
+---
+
+#### `POST /auth/demo-register`
+Convenience endpoint used in development to create demo/admin users. Same payload as `/auth/register`.
+
+Response: `200 OK` with the created user's metadata, or `409 Conflict`.
 
 ---
 
@@ -96,13 +119,13 @@ Request:
 ```
 Response:
 - `200 OK` with user metadata in the response body.
-- JWT returned in `Authorization: Bearer <token>` response header.
+- JWT returned in the `Authorization` response header as: `Authorization: Bearer <token>`.
 - `401 Unauthorized` on invalid credentials.
 
 ---
 
-#### `GET /auth/verify`
-Validates a JWT. Intended for use by other microservices.
+#### `POST /auth/verify`
+Validates the provided token and returns the user's metadata. This endpoint is protected and requires a valid token.
 
 Request header: `Authorization: Bearer <token>`
 
@@ -112,37 +135,45 @@ Response:
 
 ---
 
-### Admin Only (`/admin/**` — requires `ROLE_ADMIN`)
+### Admin Only
 
-#### `POST /admin/register`
-Creates a new user account.
-
-Request:
-```json
-{
-  "email": "user@example.com",
-  "username": "user",
-  "password": "password",
-  "role": "USER"
-}
-```
-Response: `200 OK` with the created user's metadata.
-
----
-
-#### `GET /admin/ping`
+#### `GET /admin/ping` (requires `ROLE_ADMIN`)
 Health check for admin-authenticated clients.
 
 Response: `200 OK` — `pong`
 
 ---
 
-### User (`/user/**` — requires `ROLE_USER` or `ROLE_ADMIN`)
+### User management (`/users/**`)
+These endpoints live under `UserController`.
 
-#### `GET /user/ping`
-Health check for authenticated clients.
+#### `GET /users/me` (requires `ROLE_USER` or `ROLE_ADMIN`)
+Returns the authenticated user's metadata.
 
-Response: `200 OK` — `pong`
+Request header: `Authorization: Bearer <token>`
+Response: `200 OK` with the user's metadata, or `401 Unauthorized`.
+
+---
+
+#### `PATCH /users/me` (requires `ROLE_USER` or `ROLE_ADMIN`)
+Update fields for the authenticated user. Accepts `UpdateUserRequest` in the body.
+
+Response: `200 OK` with updated user metadata, `401 Unauthorized` if not authenticated, or `404 Not Found` if the user cannot be found.
+
+---
+
+#### `GET /users/{id}` (requires `ROLE_ADMIN`)
+Fetch any user's metadata by id. Response `200 OK` or `404 Not Found`.
+
+---
+
+#### `PATCH /users/{id}` (requires `ROLE_ADMIN`)
+Update a user's fields by id. Accepts `UpdateUserRequest`. Response `200 OK` or `404 Not Found`.
+
+---
+
+#### `PATCH /users/{id}/role?role={ROLE}` (requires `ROLE_ADMIN`)
+Change a user's role. `role` is a request parameter matching the `Role` enum (e.g. `ADMIN` or `USER`). Response `200 OK` or `404 Not Found`.
 
 ---
 
