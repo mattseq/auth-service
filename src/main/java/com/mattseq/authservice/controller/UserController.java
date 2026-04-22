@@ -1,5 +1,6 @@
 package com.mattseq.authservice.controller;
 
+import com.mattseq.authservice.domain.Role;
 import com.mattseq.authservice.dto.UpdateUserRequest;
 import com.mattseq.authservice.dto.UserResponse;
 import com.mattseq.authservice.service.UserService;
@@ -31,7 +32,6 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    // TODO: VULNERABILITY: Allowing users to update their own role could lead to privilege escalation. Do not allow role changes.
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PatchMapping("/me")
     public ResponseEntity<UserResponse> updateMe(Authentication authentication, @RequestBody UpdateUserRequest updateUserRequest) {
@@ -57,6 +57,14 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest) {
         return userService.updateUser(id, updateUserRequest)
+                .map(updatedUser -> ResponseEntity.ok(UserResponse.fromUser(updatedUser)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<UserResponse> updateRole(@PathVariable Long id, @RequestParam Role role) {
+        return userService.updateRole(id, role)
                 .map(updatedUser -> ResponseEntity.ok(UserResponse.fromUser(updatedUser)))
                 .orElse(ResponseEntity.notFound().build());
     }

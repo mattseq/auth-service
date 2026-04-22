@@ -66,7 +66,13 @@ public class UserService {
             if (request.getPassword() != null) {
                 existingUser.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
             }
-            if (request.getRole() != null) existingUser.setRole(request.getRole());
+            return repo.save(existingUser);
+        });
+    }
+
+    public Optional<User> updateRole(Long id, Role role) {
+        return repo.findById(id).map(existingUser -> {
+            if (role != null) existingUser.setRole(role);
             return repo.save(existingUser);
         });
     }
