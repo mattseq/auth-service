@@ -88,21 +88,6 @@ public class AuthController {
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
-    @PostMapping("/auth/demo-register")
-    public ResponseEntity<UserResponse> registerDemo(@Valid @RequestBody CreateUserRequest request) {
-        User user = User.builder()
-                .email(request.getEmail())
-                .username(request.getUsername())
-                .password(request.getPassword())
-                .role(Role.ADMIN)
-                .build();
-
-        return userService.createUser(user)
-                .map(u -> ResponseEntity.ok(UserResponse.fromUser(u)))
-                .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
-    }
-
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/ping")
     public String adminPing() {

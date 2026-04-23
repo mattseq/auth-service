@@ -57,9 +57,11 @@ docker compose up --build
 
 The compose file exposes the auth service on `http://localhost:8080`.
 
+*To run dev environment, modify the `.env` to use the `dev` profile for the auth service, which enables additional endpoints for testing.*
+
 ## Authentication Flow
-1. Call `POST /auth/initialize` once to create the first admin account.
-2. `POST /auth/login` with credentials.
+1. Call `POST /auth/register` or `POST /auth/initialize` (if no admin account exists) to create an account.
+2. `POST /auth/login` with username and password credentials.
 3. Receive JWT in the `Authorization` response header (`Bearer <token>`).
 4. Include `Authorization: Bearer <token>` when calling protected endpoints.
 5. `GET /auth/verify` validates a token and returns user metadata (for other microservices).
@@ -100,13 +102,6 @@ Response: `200 OK` with the created user's metadata, or `409 Conflict` if the us
 
 ---
 
-#### `POST /auth/demo-register`
-Convenience endpoint used in development to create demo/admin users. Same payload as `/auth/register`.
-
-Response: `200 OK` with the created user's metadata, or `409 Conflict`.
-
----
-
 #### `POST /auth/login`
 Authenticates a user and issues a JWT.
 
@@ -136,6 +131,22 @@ Response:
 ---
 
 ### Admin Only
+
+#### `GET /admin/ping` (requires `ROLE_ADMIN`)
+Health check for admin-authenticated clients.
+
+Response: `200 OK` — `pong`
+
+---
+
+### Dev Environment Only
+
+#### `POST /auth/demo-register`
+Convenience endpoint used in development to create demo/admin users. Same payload as `/auth/register`.
+
+Response: `200 OK` with the created user's metadata, or `409 Conflict`.
+
+---
 
 #### `GET /admin/ping` (requires `ROLE_ADMIN`)
 Health check for admin-authenticated clients.
