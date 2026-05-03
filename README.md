@@ -2,6 +2,8 @@
 
 Small Spring Boot authentication service for microservices using JWTs.
 
+https://github.com/user-attachments/assets/a6d2fd49-37e7-4b7d-b45d-0564893bf3ee
+
 ## Key Features
 - Register and authenticate users (username, email, and password)
 - Passwords hashed with BCrypt before storage
